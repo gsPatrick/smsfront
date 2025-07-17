@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
-import styles from './PaymentStatusPage.module.css';
+import styles from '../PaymentStatusPage.module.css';
 
 export default function PaymentPendingPage() {
   return (

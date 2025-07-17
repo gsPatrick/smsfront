@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { XCircle } from 'lucide-react';
-import styles from './PaymentStatusPage.module.css';
+import styles from '../PaymentStatusPage.module.css';
 
 export default function PaymentCancelPage() {
   return (

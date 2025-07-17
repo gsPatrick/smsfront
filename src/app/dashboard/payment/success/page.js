@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
-import styles from './PaymentStatusPage.module.css'; // Usará um CSS compartilhado
+import styles from '../PaymentStatusPage.module.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
 import { authenticatedFetch } from '../../../utils/api';
