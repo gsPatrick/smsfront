@@ -1,0 +1,173 @@
+.header {
+  height: 80px;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 1.5rem; /* Ajuste para mobile */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 990;
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: 0 2rem;
+  }
+}
+
+.leftContent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.menuButton {
+  display: block; /* Visível em mobile */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+@media (min-width: 768px) {
+  .menuButton {
+    display: none; /* Escondido em desktop */
+  }
+}
+
+.headerTitle h2 {
+  font-size: 1.2rem; /* Ajuste para mobile */
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+@media (min-width: 768px) {
+  .headerTitle h2 {
+    font-size: 1.5rem;
+  }
+}
+
+.headerTitle p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  display: none; /* Esconde em mobile para economizar espaço */
+}
+
+@media (min-width: 768px) {
+  .headerTitle p {
+    display: block;
+  }
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Ajuste para mobile */
+}
+
+@media (min-width: 768px) {
+  .headerActions {
+    gap: 1.5rem;
+  }
+}
+
+.notification {
+  position: relative;
+  cursor: pointer;
+  color: var(--text-light);
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: var(--danger);
+  color: var(--white);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.userProfileLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  text-decoration: none; /* Remove sublinhado padrão do link */
+  color: inherit; /* Herda a cor do texto */
+}
+
+
+.userInfo, .chevron {
+  display: none; /* Esconde em mobile para economizar espaço */
+}
+
+.userInitialsPlaceholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary); /* Cor de fundo do placeholder */
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.userInfo, .chevron {
+  display: none; /* Esconde em mobile para economizar espaço */
+}
+
+
+@media (min-width: 768px) {
+  .userInfo, .chevron {
+    display: flex;
+  }
+  .userInfo {
+    flex-direction: column;
+  }
+}
+
+
+.userName {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.userEmail {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.logoutButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.logoutButton:hover {
+  background-color: var(--secondary-bg);
+  color: var(--danger);
+}

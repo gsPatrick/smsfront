@@ -1,0 +1,100 @@
+/* src/components/Sidebar/Sidebar.module.css */
+
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  background-color: var(--white);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-align: center;
+}
+
+.logoHighlight {
+  color: var(--primary);
+}
+
+.closeButton {
+  display: none; /* Escondido em desktop */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+}
+
+.nav {
+  flex-grow: 1;
+}
+
+.navSectionTitle {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    padding: 0 0.5rem;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: var(--text-light);
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Hover padrão para itens NÃO ativos */
+.navLink:hover {
+  background-color: var(--secondary-bg);
+  color: var(--text-dark);
+}
+
+/* Estilo para o item ATIVO */
+.navLink.active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+/* Hover para o item ATIVO */
+.navLink.active:hover {
+  background-color: var(--primary-hover); /* Um tom um pouco mais escuro do azul primário */
+}
+
+.adminSection {
+    margin-top: auto;
+}
+
+/* ================== Media Query para Responsividade ================== */
+@media (max-width: 767px) {
+  .sidebar {
+    transform: translateX(-100%); /* Esconde a sidebar fora da tela */
+  }
+  .sidebar.open {
+    transform: translateX(0); /* Mostra a sidebar */
+  }
+  .closeButton {
+    display: block; /* Mostra o botão de fechar em mobile */
+  }
+}

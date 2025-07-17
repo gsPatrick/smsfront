@@ -1,0 +1,147 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Menor espaçamento em telas pequenas */
+}
+
+@media (min-width: 768px) {
+  .container {
+    gap: 2rem;
+  }
+}
+
+/* =================================
+   GRID DOS KPIs (StatsCards)
+   ================================= */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: 1fr; /* 1 coluna por padrão (mobile) */
+  gap: 1rem;
+}
+
+/* 2 colunas para tablets */
+@media (min-width: 640px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* 4 colunas para desktops */
+@media (min-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+
+/* =================================
+   GRID PRINCIPAL (Gráfico e Tabela)
+   ================================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr; /* 1 coluna por padrão (mobile), empilhados */
+  gap: 1.5rem;
+}
+
+/* Layout lado a lado para desktops */
+@media (min-width: 1200px) {
+  .mainGrid {
+    /* O grid principal terá 3 colunas de fração */
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.chartContainer {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  /* Ocupa todo o espaço disponível na sua linha do grid */
+  grid-column: span 1;
+}
+
+@media (min-width: 1200px) {
+  .chartContainer {
+    /* Em telas grandes, o gráfico ocupa 2 das 3 colunas */
+    grid-column: span 2;
+  }
+}
+
+.transactionsContainer {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  /* Ocupa todo o espaço disponível na sua linha do grid */
+  grid-column: span 1;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-dark);
+}
+
+.tableWrapper {
+  flex-grow: 1;
+  overflow-x: auto; /* Permite scroll horizontal na tabela se necessário */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 1rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap; 
+}
+
+.table th {
+  color: var(--text-light);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tableCell {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.tableCellStrong {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+/* ... (seus estilos existentes) ... */
+
+.loadingState, .errorState {
+    width: 100%;
+    height: 300px; /* Altura para centralizar o texto */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--text-light);
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.errorState {
+    color: var(--danger);
+    font-weight: 600;
+}

@@ -1,0 +1,245 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.25rem;
+}
+
+.sectionSubtitle {
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+}
+
+.mainContent {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+    .mainContent {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+/* Pacotes de Créditos */
+.packagesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.packageCard {
+  background-color: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.packageCard:hover {
+  border-color: var(--primary);
+}
+
+.packageCard.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(58, 141, 255, 0.3);
+}
+
+.popularBadge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: var(--warning);
+    color: var(--text-dark);
+    padding: 0.25rem 0.6rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.radioCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.packageCard.selected .radioCircle {
+    border-color: var(--primary);
+}
+.radioInnerCircle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--primary);
+}
+
+.packageName { font-size: 1.25rem; font-weight: 600; color: var(--text-dark); }
+.packageCredits { font-size: 0.9rem; color: var(--primary); font-weight: 500; margin-bottom: 0.75rem; }
+.packageDescription { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; min-height: 50px; }
+.priceContainer { display: flex; align-items: baseline; gap: 0.5rem; }
+.packagePrice { font-size: 1.75rem; font-weight: 700; color: var(--text-dark); }
+.originalPrice { font-size: 1rem; color: var(--text-light); text-decoration: line-through; }
+
+/* Seção de Pagamento */
+.paymentSection {
+    position: sticky;
+    top: 100px; 
+}
+
+.summaryCard {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.summaryTitle { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem; }
+.summaryItem { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem; }
+.summaryItem span { color: var(--text-light); }
+.summaryItem strong { color: var(--text-dark); font-weight: 600; }
+.divider { border: 0; height: 1px; background-color: var(--border-color); margin: 1rem 0; }
+.total strong { font-size: 1.2rem; color: var(--primary); }
+
+.paymentButtons { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+.paymentButton {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    color: var(--white);
+}
+.paymentButton:hover { opacity: 0.9; }
+
+.stripe { background-color: #635bff; }
+.mercadoPago { background-color: #009ee3; }
+.pix { background-color: #32BCAD; }
+
+.securePayment {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+/* ======================= ÁREA DA CORREÇÃO ======================= */
+.historySection {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.tableWrapper { 
+  width: 100%;
+  overflow-x: auto; 
+}
+.historyTable { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+
+.historyTable th, .historyTable td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    vertical-align: middle; /* Alinha o conteúdo verticalmente */
+}
+
+.historyTable th {
+    color: var(--text-light);
+    font-weight: 500;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.historyTable tbody tr:last-child td { 
+  border-bottom: none; 
+}
+
+/* Célula de Transação customizada */
+.transactionCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.transactionPackage {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.transactionGateway {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* ===================== FIM DA ÁREA DA CORREÇÃO =================== */
+
+/* ... (seus estilos existentes) ... */
+
+/* Estilos de carregamento e erro (pode ser compartilhado globalmente) */
+.loadingState, .errorState {
+    width: 100%;
+    height: 300px; /* Altura para centralizar o texto */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--text-light);
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.errorState {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.noDataMessage {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem;
+    font-size: 1rem;
+}
+
+/* ... (seus estilos existentes) ... */
+
+/* Spinner para botão (reutiliza o de ReceberSms.module.css) */
+.buttonSpinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-left-color: var(--white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ... (o resto do seu CSS) ... */

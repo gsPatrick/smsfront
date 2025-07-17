@@ -1,0 +1,154 @@
+.container {
+    width: 100%;
+}
+
+/* Estado de Seleção */
+.selectionGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+@media (min-width: 1024px) {
+    .selectionGrid {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+.sectionTitle { font-size: 1.5rem; font-weight: 600; color: var(--text-dark); }
+.sectionSubtitle { font-size: 1rem; color: var(--text-light); margin-bottom: 1.5rem; }
+.searchBar {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+.searchIcon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+.searchInput {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 3rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: var(--white);
+}
+.servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+.summarySection {
+    position: sticky;
+    top: 100px;
+}
+.summaryCard {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+.summaryTitle { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem; }
+.summaryService { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.summaryService strong { font-size: 1.1rem; color: var(--text-dark); }
+.summaryService p { font-size: 0.9rem; color: var(--text-light); }
+
+/* NOVO: Estilo para o wrapper do ícone no resumo */
+.summaryIconWrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: var(--secondary-bg);
+    color: var(--primary);
+}
+.summaryIconWrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.summaryItem { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+.noServiceSelected { text-align: center; color: var(--text-light); padding: 2rem 0; }
+.requestButton {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.requestButton:hover { background-color: var(--primary-hover); }
+.requestButton:disabled { background-color: #a3caff; cursor: not-allowed; }
+
+/* Estado de Ativação */
+.activationCard {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.activationHeader { display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+
+/* NOVO: Estilo para o wrapper do ícone na ativação */
+.activationIconWrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: var(--secondary-bg);
+    color: var(--primary);
+}
+.activationIconWrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.cancelButton { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; background-color: #FEE2E2; color: #B91C1C; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.activationBody { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+@media (min-width: 640px) { .activationBody { grid-template-columns: 1fr 1fr; } }
+.infoBox { background-color: var(--secondary-bg); padding: 1rem; border-radius: 8px; }
+.infoLabel { font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
+.infoValue { display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; font-weight: 600; color: var(--text-dark); }
+.copyButton { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 0.25rem; }
+.countdown { color: var(--primary); }
+.smsCodeArea { padding: 1.5rem; border: 2px dashed var(--border-color); border-radius: 8px; text-align: center; margin-bottom: 1.5rem; }
+.codeReceived { justify-content: center; font-size: 2rem; letter-spacing: 0.1em; }
+.waitingForCode { display: flex; align-items: center; justify-content: center; gap: 0.75rem; color: var(--text-light); font-weight: 500; }
+.activationActions { text-align: center; }
+.reactivateButton { background: none; border: none; color: var(--primary); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+
+/* Spinners */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-left-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+.buttonSpinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-left-color: var(--white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
