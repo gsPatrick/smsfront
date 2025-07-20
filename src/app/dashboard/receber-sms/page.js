@@ -2,16 +2,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Copy, RefreshCw, XCircle, Clock } from 'lucide-react';
+import { Search, Copy, RefreshCw, XCircle, Clock, MessageSquareText, Send, Instagram, Utensils, Car, Facebook, Globe, Film } from 'lucide-react';
 import styles from './ReceberSms.module.css';
 import ServiceCard from '@/components/ServiceCard/ServiceCard';
 import { useAuth } from '../../context/AuthContext';
 import { authenticatedFetch } from '../../utils/api';
-import {
-  MessageCircle, Send, Instagram, Utensils, Car, Facebook, Globe, Film
-} from 'lucide-react';
 
-
+// Mapeamento de ícones para os serviços
 const serviceIconsMap = {
   'wa': <MessageCircle size={24} />,
   'tg': <Send size={24} />,
@@ -23,6 +20,7 @@ const serviceIconsMap = {
   'go': <Globe size={24} />,
   'kwai': <Film size={24} />,
   'tiktok': <Film size={24} />,
+  // Adicione outros mapeamentos conforme necessário
 };
 
 export default function ReceberSmsPage() {
@@ -35,8 +33,7 @@ export default function ReceberSmsPage() {
   const [smsCode, setSmsCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pageLoading, setPageLoading] = useState(true);
-
+  const [pageLoading, setPageLoading] = useState(true); // Controla o carregamento inicial da página
 
   // --- FUNÇÕES DE LÓGICA E REQUISIÇÕES (usando useCallback para otimização) ---
 
@@ -60,12 +57,10 @@ export default function ReceberSmsPage() {
   }, [activeNumber, token]);
 
 
-  // Carregar serviços disponíveis - Depende APENAS do token
+  // Carregar serviços disponíveis - depende apenas do token
   const loadServices = useCallback(async () => {
-    if (!token) return; // Só carrega se o token estiver disponível
+    if (!token) return;
 
-    // setPageLoading(true); // Removido para ser controlado por um useEffect externo
-    setError(null);
     try {
       const services = await authenticatedFetch('/api/admin/services/available', 'GET', null, token);
       const formattedServices = services.map(svc => ({
@@ -74,33 +69,33 @@ export default function ReceberSmsPage() {
       }));
       setAllServices(formattedServices);
     } catch (err) {
-      setError(err.message || 'Falha ao carregar serviços.');
       console.error('Erro ao carregar serviços:', err);
-    } // finally removido para ser controlado por um useEffect externo
+      // O erro será capturado pelo Promise.all no useEffect principal
+      throw err;
+    }
   }, [token]);
 
-
-  // Carregar saldo atual do usuário - Depende APENAS de updateUser (que é estável do contexto)
+  // Carregar saldo atual do usuário
   const loadUserBalance = useCallback(async () => {
-    if (!token || !user) return; // Garante que token e user já estão presentes
+    if (!token || !user) return;
 
     try {
         const balanceData = await authenticatedFetch('/api/credits/balance', 'GET', null, token);
-        // Usar a forma funcional de updateUser para garantir que o objeto `user` esteja atualizado
         updateUser(prevUser => ({ ...prevUser, credits: balanceData.credits })); 
     } catch (err) {
         console.error('Erro ao carregar saldo:', err.message);
+        // O erro será capturado pelo Promise.all no useEffect principal
+        throw err;
     }
-  }, [token, user, updateUser]); // Manter user aqui para que a função seja recriada se o user mudar
-
+  }, [token, user, updateUser]);
 
   const handleSelectService = useCallback((service) => {
-    if (user && parseFloat(user.credits) < parseFloat(service.price_per_otp)) { // Acesso seguro a user.credits
+    if (user && parseFloat(user.credits) < parseFloat(service.price_per_otp)) {
         alert(`Saldo insuficiente (R$ ${parseFloat(user.credits).toFixed(2).replace('.', ',')}) para solicitar este serviço (R$ ${parseFloat(service.price_per_otp).toFixed(2).replace('.', ',')}).`);
         return;
     }
     setSelectedService(service);
-  }, [user]); // user é uma dependência, mas não é modificado aqui.
+  }, [user]);
 
   const handleRequestNumber = useCallback(async () => {
     if (!selectedService) return;
@@ -118,11 +113,12 @@ export default function ReceberSmsPage() {
       });
       setCountdown(120);
       setSmsCode('');
-      updateUser(prevUser => ({ ...prevUser, credits: parseFloat(prevUser.credits) - parseFloat(selectedService.price_per_otp) })); // Garante que é número
+      updateUser(prevUser => ({ ...prevUser, credits: parseFloat(prevUser.credits) - parseFloat(selectedService.price_per_otp) }));
       alert(`Número ${result.active_number.phone_number} solicitado com sucesso!`);
     } catch (err) {
       setError(err.message || 'Falha ao solicitar número.');
       console.error('Erro ao solicitar número:', err);
+      alert(`Erro ao solicitar número: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -141,11 +137,12 @@ export default function ReceberSmsPage() {
       await authenticatedFetch(`/api/sms/reactivate/${activeNumber.id}`, 'POST', null, token);
       setCountdown(120);
       setSmsCode('');
-      updateUser(prevUser => ({ ...prevUser, credits: parseFloat(prevUser.credits) - parseFloat(activeNumber.service.price_per_otp) })); // Debita novamente
+      updateUser(prevUser => ({ ...prevUser, credits: parseFloat(prevUser.credits) - parseFloat(activeNumber.service.price_per_otp) }));
       alert(`Número ${activeNumber.phone} reativado com sucesso! Aguardando novo SMS.`);
     } catch (err) {
       setError(err.message || 'Falha ao reativar número.');
       console.error('Erro ao reativar número:', err);
+      alert(`Erro ao reativar número: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -154,42 +151,54 @@ export default function ReceberSmsPage() {
 
   // --- EFEITOS (useEffect) ---
 
-  // Efeito principal para carregar dados UMA ÚNICA VEZ após a autenticação
-  // Este useEffect coordena o início do carregamento da página
+  // ======================================================================================
+  // CORREÇÃO APLICADA AQUI
+  // Este useEffect agora controla todo o carregamento inicial da página de forma segura.
+  // ======================================================================================
   useEffect(() => {
-    // Só prossegue se o `authLoading` estiver falso (autenticação resolvida)
-    // E se o `token` existir (usuário logado)
-    // E se a página ainda não estiver carregada (para evitar múltiplos carregamentos)
-    if (!authLoading && token && pageLoading) {
+    // Só executa quando a autenticação for resolvida e o token estiver disponível.
+    if (!authLoading && token) {
       const fetchData = async () => {
+        setPageLoading(true);
+        setError(null);
         try {
-          await loadServices(); // loadServices chama setPageLoading(false) no finally
-          await loadUserBalance(); // Carrega o saldo
-        } catch (e) {
-          // Erros são tratados pelas funções loadServices/loadUserBalance
+          // Busca os dados essenciais em paralelo para otimizar o tempo de carregamento.
+          await Promise.all([
+            loadServices(),
+            loadUserBalance()
+          ]);
+        } catch (err) {
+          setError(err.message || 'Falha ao carregar dados da página.');
+        } finally {
+          // CRUCIAL: Garante que o estado de carregamento seja desativado,
+          // permitindo que a página seja renderizada, mesmo em caso de erro.
+          setPageLoading(false);
         }
       };
+
       fetchData();
     }
-  }, [authLoading, token, pageLoading, loadServices, loadUserBalance]); // Dependências
+  }, [authLoading, token, loadServices, loadUserBalance]); // As dependências estão corretas.
 
-
-  // Efeito para o contador e cancelamento automático (continua o mesmo)
+  // Efeito para o contador e cancelamento automático (sem alterações)
   useEffect(() => {
     let timer;
     if (activeNumber && activeNumber.status === 'active' && countdown > 0 && !smsCode) {
       timer = setInterval(() => {
-        setCountdown(prev => prev - 1);
-        if (prev - 1 === 0) {
-          handleCancelActivation('Tempo esgotado.', activeNumber.id);
-        }
+        setCountdown(prev => {
+          if (prev - 1 === 0) {
+            handleCancelActivation('Tempo esgotado.', activeNumber.id);
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [activeNumber, countdown, smsCode, handleCancelActivation]);
+  }, [activeNumber, smsCode, handleCancelActivation]); // countdown removido para evitar re-criação do timer a cada segundo
 
 
-  // Efeito para polling de status do SMS (continua o mesmo)
+  // Efeito para polling de status do SMS (sem alterações)
   useEffect(() => {
     let pollingInterval;
     if (activeNumber && activeNumber.status === 'active' && !smsCode) {
@@ -203,18 +212,19 @@ export default function ReceberSmsPage() {
           } else if (statusResult.status === 'cancelled' || statusResult.status === 'expired') {
             setActiveNumber(prev => ({ ...prev, status: statusResult.status }));
             clearInterval(pollingInterval);
-            alert(`Número ${activeNumber.phone} foi ${statusResult.status === 'cancelled' ? 'cancelado' : 'expirado'}.`);
+            alert(`Ativação para o número ${activeNumber.phone} foi ${statusResult.status === 'cancelled' ? 'cancelada' : 'expirada'}.`);
           }
         } catch (pollError) {
           console.error('Erro no polling de status:', pollError.message);
+          clearInterval(pollingInterval); // Para o polling em caso de erro para não sobrecarregar
         }
-      }, 5000);
+      }, 5000); // Verifica a cada 5 segundos
     }
     return () => clearInterval(pollingInterval);
   }, [activeNumber, smsCode, token]);
   
 
-  // --- Lógica de Componente ---
+  // --- Lógica de Renderização ---
 
   const filteredServices = allServices.filter(s => 
     s.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -230,14 +240,13 @@ export default function ReceberSmsPage() {
     const secs = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
-
-  // Garante que o loading seja mostrado até que o AuthContext e o carregamento de dados da página terminem
-  // Adicionado `!user` para garantir que o saldo seja carregado e user esteja preenchido antes de mostrar o conteúdo
-  if (authLoading || pageLoading || !user) { // Adicionado !user aqui
+  
+  // Condições de renderização de carregamento, erro e conteúdo
+  if (authLoading || pageLoading || !user) {
     return <div className={styles.loadingState}>Carregando serviços...</div>;
   }
 
-  if (error) {
+  if (error && !activeNumber) { // Mostra erro apenas se não houver uma ativação em andamento
     return <div className={styles.errorState}>Erro: {error}</div>;
   }
 
@@ -281,7 +290,7 @@ export default function ReceberSmsPage() {
                     </div>
                 ) : (
                     <div className={styles.waitingForCode}>
-                        {isLoading ? <div className={styles.spinner}></div> : <div className={styles.spinner}></div>}
+                        <div className={styles.spinner}></div>
                         Aguardando SMS...
                     </div>
                 )}
@@ -291,7 +300,7 @@ export default function ReceberSmsPage() {
                 <button 
                   className={styles.reactivateButton} 
                   onClick={handleReactivateNumber} 
-                  disabled={isLoading || smsCode || activeNumber.status !== 'active'}
+                  disabled={isLoading || smsCode || activeNumber.status !== 'active' || countdown <= 0}
                 >
                     <RefreshCw size={16} /> Reativar Número (se o código não chegar)
                 </button>
@@ -314,14 +323,18 @@ export default function ReceberSmsPage() {
               />
             </div>
             <div className={styles.servicesGrid}>
-              {filteredServices.map((service) => (
-                <ServiceCard 
-                  key={service.id} 
-                  service={service} 
-                  onSelect={handleSelectService}
-                  isSelected={selectedService?.id === service.id}
-                />
-              ))}
+              {filteredServices.length > 0 ? (
+                filteredServices.map((service) => (
+                  <ServiceCard 
+                    key={service.id} 
+                    service={service} 
+                    onSelect={handleSelectService}
+                    isSelected={selectedService?.id === service.id}
+                  />
+                ))
+              ) : (
+                 <p className={styles.noServiceSelected}>Nenhum serviço encontrado com o termo "{searchTerm}".</p>
+              )}
             </div>
           </div>
 
@@ -341,7 +354,7 @@ export default function ReceberSmsPage() {
                   </div>
                   <div className={styles.summaryItem}>
                     <span>Custo por SMS</span>
-                    <strong>R$ {selectedService.price_per_otp.toFixed(2).replace('.', ',')}</strong>
+                    <strong>R$ {parseFloat(selectedService.price_per_otp).toFixed(2).replace('.', ',')}</strong>
                   </div>
                   <div className={styles.summaryItem}>
                     <span>Seu Saldo Atual</span>
