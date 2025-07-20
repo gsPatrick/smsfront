@@ -2,7 +2,9 @@
     width: 100%;
 }
 
-/* Estado de Seleção */
+/* ============================ */
+/*        TELA DE SELEÇÃO       */
+/* ============================ */
 .selectionGrid {
     display: grid;
     grid-template-columns: 1fr;
@@ -13,12 +15,27 @@
         grid-template-columns: 2fr 1fr;
     }
 }
-.sectionTitle { font-size: 1.5rem; font-weight: 600; color: var(--text-dark); }
-.sectionSubtitle { font-size: 1rem; color: var(--text-light); margin-bottom: 1.5rem; }
+
+.sectionTitle { 
+    font-size: 1.25rem; /* Ajustado */
+    font-weight: 600; 
+    color: var(--text-dark); 
+    margin-bottom: 1rem;
+}
+
+/* Coluna da Esquerda: Serviços */
+.serviceList {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
 .searchBar {
     position: relative;
     margin-bottom: 1.5rem;
 }
+
 .searchIcon {
     position: absolute;
     top: 50%;
@@ -26,6 +43,7 @@
     transform: translateY(-50%);
     color: var(--text-light);
 }
+
 .searchInput {
     width: 100%;
     padding: 0.8rem 1rem 0.8rem 3rem;
@@ -34,44 +52,93 @@
     font-size: 1rem;
     background-color: var(--white);
 }
+
 .servicesGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
 }
+
+/* Coluna da Direita: Países e Ativação */
 .summarySection {
     position: sticky;
     top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
-.summaryCard {
+
+.countryListWrapper {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.placeholderText {
+    margin: auto;
+    text-align: center;
+    color: var(--text-light);
+}
+
+.countryList {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem; /* Espaço para a barra de rolagem */
+}
+
+/* Estilo de cada item da lista de países */
+.countryItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: 1px solid transparent;
+}
+.countryItem:hover {
+    background-color: var(--secondary-bg);
+}
+.countryItem.selected {
+    background-color: #EBF2FF;
+    border-color: var(--primary);
+    font-weight: 600;
+}
+
+.countryInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.countryName {
+    color: var(--text-dark);
+}
+.countryCount {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+.countryPrice {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.activationButtonWrapper {
     background-color: var(--white);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1.5rem;
 }
-.summaryTitle { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem; }
-.summaryService { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.summaryService strong { font-size: 1.1rem; color: var(--text-dark); }
-.summaryService p { font-size: 0.9rem; color: var(--text-light); }
-
-/* NOVO: Estilo para o wrapper do ícone no resumo */
-.summaryIconWrapper {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    background-color: var(--secondary-bg);
-    color: var(--primary);
-}
-.summaryIconWrapper svg {
-    width: 24px;
-    height: 24px;
-}
-
 .summaryItem { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+.summaryItem span { color: var(--text-light); }
+.summaryItem strong { color: var(--text-dark); font-weight: 600; }
+
 .noServiceSelected { text-align: center; color: var(--text-light); padding: 2rem 0; }
+
 .requestButton {
     width: 100%;
     padding: 0.8rem;
@@ -91,7 +158,9 @@
 .requestButton:hover { background-color: var(--primary-hover); }
 .requestButton:disabled { background-color: #a3caff; cursor: not-allowed; }
 
-/* Estado de Ativação */
+/* ============================ */
+/*        TELA DE ATIVAÇÃO      */
+/* ============================ */
 .activationCard {
     background-color: var(--white);
     border: 1px solid var(--border-color);
@@ -102,7 +171,6 @@
 }
 .activationHeader { display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; }
 
-/* NOVO: Estilo para o wrapper do ícone na ativação */
 .activationIconWrapper {
     width: 40px;
     height: 40px;
@@ -132,8 +200,23 @@
 .activationActions { text-align: center; }
 .reactivateButton { background: none; border: none; color: var(--primary); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
 
-/* Spinners */
-.spinner {
+/* ============================ */
+/*        UTILITÁRIOS           */
+/* ============================ */
+.loadingState, .errorState {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    color: var(--text-light);
+}
+.errorState {
+    color: var(--danger);
+}
+
+.spinner, .buttonSpinner {
     width: 20px;
     height: 20px;
     border: 3px solid rgba(0,0,0,0.1);
@@ -142,12 +225,8 @@
     animation: spin 1s linear infinite;
 }
 .buttonSpinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.3);
     border-left-color: var(--white);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
 }
 @keyframes spin {
     to { transform: rotate(360deg); }
