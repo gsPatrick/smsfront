@@ -2,7 +2,8 @@
 import styles from './ServiceCard.module.css';
 
 const ServiceCard = ({ service, onSelect, isSelected }) => {
-  const price = parseFloat(service.price_per_otp || 0);
+  // A API agora fornece 'sellPrice' como o preço final para o usuário.
+  const price = parseFloat(service.sellPrice || 0);
 
   return (
     <div
@@ -14,8 +15,8 @@ const ServiceCard = ({ service, onSelect, isSelected }) => {
       </div>
       <div className={styles.cardContent}>
         <h3 className={styles.name}>{service.name}</h3>
-        {/* ✅ ALTERAÇÃO: Mostra o preço como "A partir de" */}
-        <p className={styles.price}>A partir de R$ {price.toFixed(2).replace('.', ',')}</p>
+        {/* Exibe o preço de venda formatado */}
+        <p className={styles.price}>R$ {price.toFixed(2).replace('.', ',')}</p>
       </div>
     </div>
   );
