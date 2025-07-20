@@ -7,8 +7,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import StatsCard from '@/components/StatsCard/StatsCard';
 import StatusBadge from '@/components/StatusBadge/StatusBadge';
 import styles from './DashboardPage.module.css';
-import { useAuth } from '../context/AuthContext'; // Importe o AuthContext
-import { authenticatedFetch } from '../utils/api'; // Importe a função de fetch autenticada
+import { useAuth } from '../context/AuthContext';
+import { authenticatedFetch } from '../utils/api';
 
 export default function DashboardPage() {
   const { user, token, loading: authLoading } = useAuth();
@@ -17,7 +17,7 @@ export default function DashboardPage() {
     totalSent: 0,
     deliveryRate: '0%',
     failedSms: 0,
-    chartData: [], // Agora será preenchido pela API
+    chartData: [],
     recentTransactions: [],
   });
   const [dataLoading, setDataLoading] = useState(true);
@@ -30,44 +30,54 @@ export default function DashboardPage() {
     setDataLoading(true);
     setError(null);
     try {
-      // 1. Obter Saldo de Créditos
+      // 1. Obter Saldo de Créditos (continua igual)
       const balanceData = await authenticatedFetch('/api/credits/balance', 'GET', null, token);
       
-      // 2. Obter Histórico de SMS para KPIs e Transações Recentes
+      // 2. Obter Histórico de SMS e Dados para o Gráfico
       const smsHistoryData = await authenticatedFetch('/api/sms/history?limit=100', 'GET', null, token);
-      
-      const totalSent = smsHistoryData.pagination.total_items;
-      const deliveredSms = smsHistoryData.messages.filter(msg => msg.status === 'received').length;
-      const failedSms = smsHistoryData.messages.filter(msg => msg.status === 'cancelled').length;
-      const deliveryRate = totalSent > 0 ? ((deliveredSms / totalSent) * 100).toFixed(2) : 0;
-
-      // 3. Obter Dados para o Gráfico (novo endpoint)
       const chartStats = await authenticatedFetch('/api/sms/stats?period=daily&days=30', 'GET', null, token);
-      // Recharts espera nomes de chaves específicas. Mapear os dados da API.
-      const formattedChartData = chartStats.map(item => ({
-        name: item.date, // Ex: "16/07"
+
+      // =========================================================================
+      // ✅ CORREÇÃO APLICADA AQUI
+      // Adicionamos verificações para garantir que os dados existem antes de usá-los.
+      // Isso evita o erro "Cannot read properties of undefined (reading 'pagination')"
+      // =========================================================================
+      let totalSent = 0;
+      let deliveredSms = 0;
+      let failedSms = 0;
+      let recentSmsMessages = [];
+
+      // Apenas processa os dados do histórico se eles existirem
+      if (smsHistoryData && smsHistoryData.pagination && smsHistoryData.messages) {
+        totalSent = smsHistoryData.pagination.total_items;
+        deliveredSms = smsHistoryData.messages.filter(msg => msg.status === 'received').length;
+        failedSms = smsHistoryData.messages.filter(msg => msg.status === 'cancelled').length;
+        
+        recentSmsMessages = smsHistoryData.messages.slice(0, 5).map(msg => ({
+          id: msg.id,
+          service: msg.metadata?.service_name || msg.service_code, 
+          date: new Date(msg.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
+          status: msg.status === 'received' ? 'Entregue' : msg.status === 'cancelled' ? 'Falhou' : 'Pendente',
+          amount: `R$ ${parseFloat(msg.cost || 0).toFixed(2).replace('.', ',')}`,
+        }));
+      }
+
+      const deliveryRate = totalSent > 0 ? ((deliveredSms / totalSent) * 100).toFixed(2) : 0;
+      
+      // Processa dados do gráfico (também com verificação)
+      const formattedChartData = Array.isArray(chartStats) ? chartStats.map(item => ({
+        name: item.date,
         envios: item.delivered_sms,
         falhas: item.failed_sms,
-      }));
-      // Opcional: Garantir que o array tenha uma ordem lógica para o gráfico (pode ser feito no backend também)
-      // chartStats.sort((a, b) => new Date(a.date.split('/').reverse().join('-')) - new Date(b.date.split('/').reverse().join('-')));
-      
-      // Envios Recentes (do histórico de SMS)
-      const recentSmsMessages = smsHistoryData.messages.slice(0, 5).map(msg => ({
-        id: msg.id,
-        service: msg.service_code, 
-        date: new Date(msg.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
-        status: msg.status === 'received' ? 'Entregue' : msg.status === 'cancelled' ? 'Falhou' : 'Pendente',
-        amount: `R$ ${parseFloat(msg.cost || 0).toFixed(2).replace('.', ',')}`,
-      }));
-      
+      })) : [];
 
+      // Atualiza o estado com os dados seguros
       setDashboardData({
-        credits: `R$ ${parseFloat(balanceData.credits).toFixed(2).replace('.', ',')}`,
+        credits: `R$ ${parseFloat(balanceData?.credits || 0).toFixed(2).replace('.', ',')}`,
         totalSent: totalSent,
         deliveryRate: `${deliveryRate}%`,
         failedSms: failedSms,
-        chartData: formattedChartData, // Dados reais do gráfico
+        chartData: formattedChartData,
         recentTransactions: recentSmsMessages,
       });
 
@@ -137,7 +147,7 @@ export default function DashboardPage() {
       {/* Seção de Gráficos e Transações Recentes */}
       <div className={styles.mainGrid}>
         <div className={styles.chartContainer}>
-          <h3 className={styles.sectionTitle}>Uso de SMS nos últimos 30 dias</h3> {/* Título atualizado */}
+          <h3 className={styles.sectionTitle}>Uso de SMS nos últimos 30 dias</h3>
           {dashboardData.chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={dashboardData.chartData}>
