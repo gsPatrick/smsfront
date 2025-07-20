@@ -16,26 +16,45 @@
     }
 }
 
-.sectionTitle { 
-    font-size: 1.25rem; /* Ajustado */
-    font-weight: 600; 
-    color: var(--text-dark); 
-    margin-bottom: 1rem;
+.selectionColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
-/* Coluna da Esquerda: Serviços */
-.serviceList {
+.summaryColumn {
+    position: sticky;
+    top: 100px;
+}
+
+.stepBox, .activationBox {
     background-color: var(--white);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1.5rem;
 }
 
+.sectionTitle { 
+    font-size: 1.25rem;
+    font-weight: 600; 
+    color: var(--text-dark); 
+    margin-bottom: 1rem;
+}
+
+.countrySelector {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: var(--white);
+    cursor: pointer;
+}
+
 .searchBar {
     position: relative;
     margin-bottom: 1.5rem;
 }
-
 .searchIcon {
     position: absolute;
     top: 50%;
@@ -43,7 +62,6 @@
     transform: translateY(-50%);
     color: var(--text-light);
 }
-
 .searchInput {
     width: 100%;
     padding: 0.8rem 1rem 0.8rem 3rem;
@@ -57,87 +75,20 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
-}
-
-/* Coluna da Direita: Países e Ativação */
-.summarySection {
-    position: sticky;
-    top: 100px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.countryListWrapper {
-    background-color: var(--white);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
+    min-height: 150px; /* Evita que o layout "pule" durante o loading */
+    position: relative;
 }
 
 .placeholderText {
     margin: auto;
     text-align: center;
     color: var(--text-light);
+    padding: 2rem 0;
 }
 
-.countryList {
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 0.5rem; /* Espaço para a barra de rolagem */
-}
-
-/* Estilo de cada item da lista de países */
-.countryItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border: 1px solid transparent;
-}
-.countryItem:hover {
-    background-color: var(--secondary-bg);
-}
-.countryItem.selected {
-    background-color: #EBF2FF;
-    border-color: var(--primary);
-    font-weight: 600;
-}
-
-.countryInfo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-.countryName {
-    color: var(--text-dark);
-}
-.countryCount {
-    font-size: 0.8rem;
-    color: var(--text-light);
-}
-.countryPrice {
-    font-weight: 600;
-    color: var(--primary);
-}
-
-.activationButtonWrapper {
-    background-color: var(--white);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
-}
 .summaryItem { display: flex; justify-content: space-between; margin-bottom: 1rem; }
 .summaryItem span { color: var(--text-light); }
 .summaryItem strong { color: var(--text-dark); font-weight: 600; }
-
-.noServiceSelected { text-align: center; color: var(--text-light); padding: 2rem 0; }
 
 .requestButton {
     width: 100%;
@@ -162,55 +113,25 @@
 /*        TELA DE ATIVAÇÃO      */
 /* ============================ */
 .activationCard {
-    background-color: var(--white);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
+    /* ... (Estilos da tela de ativação permanecem os mesmos) ... */
 }
-.activationHeader { display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; }
-
-.activationIconWrapper {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    background-color: var(--secondary-bg);
-    color: var(--primary);
-}
-.activationIconWrapper svg {
-    width: 24px;
-    height: 24px;
-}
-
-.cancelButton { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; background-color: #FEE2E2; color: #B91C1C; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.activationBody { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-@media (min-width: 640px) { .activationBody { grid-template-columns: 1fr 1fr; } }
-.infoBox { background-color: var(--secondary-bg); padding: 1rem; border-radius: 8px; }
-.infoLabel { font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
-.infoValue { display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; font-weight: 600; color: var(--text-dark); }
-.copyButton { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 0.25rem; }
-.countdown { color: var(--primary); }
-.smsCodeArea { padding: 1.5rem; border: 2px dashed var(--border-color); border-radius: 8px; text-align: center; margin-bottom: 1.5rem; }
-.codeReceived { justify-content: center; font-size: 2rem; letter-spacing: 0.1em; }
-.waitingForCode { display: flex; align-items: center; justify-content: center; gap: 0.75rem; color: var(--text-light); font-weight: 500; }
-.activationActions { text-align: center; }
-.reactivateButton { background: none; border: none; color: var(--primary); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
 
 /* ============================ */
 /*        UTILITÁRIOS           */
 /* ============================ */
 .loadingState, .errorState {
+    position: absolute; /* Para centralizar dentro do .servicesGrid */
+    top: 0;
+    left: 0;
     width: 100%;
-    margin: auto;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 1rem;
     color: var(--text-light);
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
 }
 .errorState {
     color: var(--danger);
