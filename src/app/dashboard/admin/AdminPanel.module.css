@@ -416,3 +416,76 @@
 .modalActions .submitButton:hover {
     background-color: var(--primary-hover);
 }
+
+/* ======================================= */
+/*  NOVOS ESTILOS PARA A ABA CONFIGURAÇÕES */
+/* ======================================= */
+
+.settingsCard {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 800px; /* Limita a largura para melhor legibilidade */
+    margin: 0 auto; /* Centraliza o card */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.cardTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.cardSubtitle {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin-top: -1rem; /* Aproxima do título */
+    margin-bottom: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: var(--secondary-bg);
+    color: var(--text-dark);
+    font-family: monospace; /* Melhor para chaves de API */
+}
+
+.formHint {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+}
+
+.settingsActions {
+    display: flex;
+    justify-content: flex-end; /* Alinha o botão à direita */
+    margin-top: 1rem;
+}
+
+.tableHeaderActions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+}
