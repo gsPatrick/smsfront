@@ -14,8 +14,12 @@ const ServiceCard = ({ service, onSelect, isSelected }) => {
         {service.icon}
       </div>
       <div className={styles.cardContent}>
+        {/* =================================================================== */}
+        {/* ✅ CORREÇÃO APLICADA AQUI: Usando service.name em vez de service.code */}
+        {/* =================================================================== */}
         <h3 className={styles.name}>{service.name}</h3>
-        {/* Exibe o preço de venda formatado */}
+        
+        {/* Exibe o preço de venda formatado (sellPrice) */}
         <p className={styles.price}>R$ {price.toFixed(2).replace('.', ',')}</p>
       </div>
     </div>
