@@ -1,19 +1,26 @@
-// Removido: import Image from 'next/image';
+// src/components/ServiceCard/Service-Card.js
 import styles from './ServiceCard.module.css';
 
 // Agora service.icon será um componente Lucide React
 const ServiceCard = ({ service, onSelect, isSelected }) => {
+  // =========================================================================
+  // CORREÇÃO APLICADA AQUI: Convertendo price_per_otp para número
+  // parseFloat() garante que o valor seja um número antes de usar toFixed().
+  // =========================================================================
+  const price = parseFloat(service.price_per_otp || 0);
+
   return (
     <div
       className={`${styles.card} ${isSelected ? styles.selected : ''}`}
       onClick={() => onSelect(service)}
     >
-      <div className={styles.iconWrapper}> {/* Adicionado um wrapper para o ícone */}
+      <div className={styles.iconWrapper}>
         {service.icon}
       </div>
       <div className={styles.cardContent}>
         <h3 className={styles.name}>{service.name}</h3>
-        <p className={styles.price}>R$ {service.price_per_otp.toFixed(2).replace('.', ',')}</p>
+        {/* Usando a variável 'price' já convertida */}
+        <p className={styles.price}>R$ {price.toFixed(2).replace('.', ',')}</p>
       </div>
     </div>
   );

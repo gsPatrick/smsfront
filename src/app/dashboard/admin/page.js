@@ -32,6 +32,12 @@ export default function AdminPanelPage() {
     // --- State das Mensagens SMS (Mantido para integridade do componente) ---
     const [smsMessages, setSmsMessages] = useState([]);
     const [smsMessageCount, setSmsMessageCount] = useState(0);
+    const [smsSearchTerm, setSmsSearchTerm] = useState('');
+    const [smsServiceFilter, setSmsServiceFilter] = useState('');
+    const [smsStatusFilter, setSmsStatusFilter] = useState('');
+    const [smsUserFilter, setSmsUserFilter] = useState('');
+    const [smsLoading, setSmsLoading] = useState(true);
+    const [smsError, setSmsError] = useState(null);
 
     // --- State dos Serviços ---
     const [services, setServices] = useState([]);
@@ -110,6 +116,29 @@ export default function AdminPanelPage() {
         }
     }, [token, authLoading, currentPage, userSearchTerm, userRoleFilter, userStatusFilter]);
     
+    const loadSmsMessages = useCallback(async () => {
+        if (!token || authLoading) return;
+        setSmsLoading(true);
+        setSmsError(null);
+        try {
+            const queryParams = new URLSearchParams({
+                page: currentPage,
+                limit: itemsPerPage,
+                ...(smsSearchTerm && { search: smsSearchTerm }),
+                ...(smsServiceFilter && { service_code: smsServiceFilter }),
+                ...(smsStatusFilter && { status: smsStatusFilter }),
+                ...(smsUserFilter && { user_id: smsUserFilter })
+            });
+            const data = await authenticatedFetch(`/api/sms/all-history?${queryParams.toString()}`, 'GET', null, token);
+            setSmsMessages(data.messages);
+            setSmsMessageCount(data.pagination.total_items);
+        } catch (err) {
+            setSmsError(err.message || 'Falha ao carregar mensagens SMS.');
+        } finally {
+            setSmsLoading(false);
+        }
+    }, [token, authLoading, currentPage, smsSearchTerm, smsServiceFilter, smsStatusFilter, smsUserFilter]);
+
     const loadSmsServices = useCallback(async () => {
         if (!token || authLoading) return;
         setServicesLoading(true);
@@ -135,14 +164,16 @@ export default function AdminPanelPage() {
     useEffect(() => {
         setCurrentPage(1);
         if (activeTab === 'users') loadUsers();
+        if (activeTab === 'sms') loadSmsMessages();
         if (activeTab === 'services') loadSmsServices();
         if (activeTab === 'settings') loadSettings();
-    }, [activeTab, loadUsers, loadSmsServices, loadSettings]);
+    }, [activeTab, userSearchTerm, userRoleFilter, userStatusFilter, smsSearchTerm, smsServiceFilter, smsStatusFilter, smsUserFilter, serviceSearchTerm, serviceCategoryFilter, serviceStatusFilter, loadUsers, loadSmsMessages, loadSmsServices, loadSettings]);
 
     useEffect(() => {
         if (activeTab === 'users') loadUsers();
+        if (activeTab === 'sms') loadSmsMessages();
         if (activeTab === 'services') loadSmsServices();
-    }, [currentPage, activeTab, loadUsers, loadSmsServices]);
+    }, [currentPage, activeTab, loadUsers, loadSmsMessages, loadSmsServices]);
 
     // --- Funções de Ação e Modal ---
     const handleCreateService = () => { setEditingService(null); setIsServiceModalOpen(true); };
@@ -189,21 +220,23 @@ export default function AdminPanelPage() {
         };
 
         return (
-            <div className={styles.modalOverlay}><div className={styles.modalContent}>
-                <h3 className={styles.modalTitle}>{service ? 'Editar Serviço' : 'Criar Novo Serviço'}</h3>
-                <form onSubmit={handleSubmit} className={styles.modalForm}>
-                    <input name="name" placeholder="Nome" value={formData.name} onChange={handleChange} required />
-                    <input name="code" placeholder="Código (ex: wa)" value={formData.code} onChange={handleChange} required />
-                    <input name="price_per_otp" type="number" step="0.01" placeholder="Preço" value={formData.price_per_otp} onChange={handleChange} required />
-                    <textarea name="description" placeholder="Descrição" value={formData.description} onChange={handleChange}></textarea>
-                    <input name="category" placeholder="Categoria" value={formData.category} onChange={handleChange} />
-                    <div><input name="active" type="checkbox" checked={formData.active} onChange={handleChange} /> Ativo</div>
-                    <div className={styles.modalActions}>
-                        <button type="button" onClick={onClose} className={styles.cancelButton}>Cancelar</button>
-                        <button type="submit" className={styles.submitButton}>Salvar</button>
-                    </div>
-                </form>
-            </div></div>
+            <div className={styles.modalOverlay}>
+                <div className={styles.modalContent}>
+                    <h3 className={styles.modalTitle}>{service ? 'Editar Serviço' : 'Criar Novo Serviço'}</h3>
+                    <form onSubmit={handleSubmit} className={styles.modalForm}>
+                        <input name="name" placeholder="Nome" value={formData.name} onChange={handleChange} required />
+                        <input name="code" placeholder="Código (ex: wa)" value={formData.code} onChange={handleChange} required />
+                        <input name="price_per_otp" type="number" step="0.01" placeholder="Preço" value={formData.price_per_otp} onChange={handleChange} required />
+                        <textarea name="description" placeholder="Descrição" value={formData.description} onChange={handleChange}></textarea>
+                        <input name="category" placeholder="Categoria" value={formData.category} onChange={handleChange} />
+                        <div><input name="active" type="checkbox" id="serviceActive" checked={formData.active} onChange={handleChange} /> <label htmlFor="serviceActive">Ativo</label></div>
+                        <div className={styles.modalActions}>
+                            <button type="button" onClick={onClose} className={styles.cancelButton}>Cancelar</button>
+                            <button type="submit" className={styles.submitButton}>Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         );
     };
 
@@ -221,11 +254,32 @@ export default function AdminPanelPage() {
                             {users.length > 0 ? users.map(user => (
                                 <tr key={user.id}>
                                     <td>{user.id.substring(0, 8)}...</td><td>{user.username}</td><td>{user.email}</td>
-                                    <td>R$ {parseFloat(user.credits).toFixed(2)}</td><td>{user.role}</td>
+                                    <td>R$ {parseFloat(user.credits).toFixed(2).replace('.',',')}</td><td>{user.role}</td>
                                     <td><StatusBadge status={user.is_active ? 'Ativo' : 'Inativo'} /></td>
-                                    <td className={styles.actionsCell}><button><Edit size={16}/></button><button><Trash2 size={16}/></button></td>
+                                    <td className={styles.actionsCell}><button className={styles.actionButton}><Edit size={16}/></button><button className={`${styles.actionButton} ${styles.deleteButton}`}><Trash2 size={16}/></button></td>
                                 </tr>
                             )) : <tr><td colSpan="7" className={styles.noResults}>Nenhum usuário encontrado.</td></tr>}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    } else if (activeTab === 'sms') {
+        if (smsLoading) content = <div className={styles.loadingState}>Carregando mensagens...</div>;
+        else if (smsError) content = <div className={styles.errorState}>{smsError}</div>;
+        else content = (
+            <div className={styles.tableCard}>
+                <div className={styles.tableWrapper}>
+                    <table className={styles.adminTable}>
+                        <thead><tr><th>ID</th><th>Usuário</th><th>Serviço</th><th>Número</th><th>Código</th><th>Data</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {smsMessages.length > 0 ? smsMessages.map(msg => (
+                                <tr key={msg.id}>
+                                    <td>{msg.id.substring(0,8)}...</td><td>{msg.user?.username || msg.user_id}</td>
+                                    <td>{msg.service_code}</td><td>{msg.to_number}</td><td>{msg.message_body || '-'}</td>
+                                    <td>{new Date(msg.created_at).toLocaleString('pt-BR')}</td><td><StatusBadge status={msg.status} /></td>
+                                </tr>
+                            )) : <tr><td colSpan="7" className={styles.noResults}>Nenhuma mensagem encontrada.</td></tr>}
                         </tbody>
                     </table>
                 </div>
@@ -248,7 +302,7 @@ export default function AdminPanelPage() {
                             {services.length > 0 ? services.map(service => (
                                 <tr key={service.id}>
                                     <td>{service.name}</td><td>{service.code}</td>
-                                    <td>R$ {parseFloat(service.price_per_otp).toFixed(2).replace('.', ',')}</td>
+                                    <td>R$ {parseFloat(service.price_per_otp || 0).toFixed(2).replace('.', ',')}</td>
                                     <td><StatusBadge status={service.active ? 'Ativo' : 'Inativo'} /></td>
                                     <td className={styles.actionsCell}>
                                         <button className={styles.actionButton} onClick={() => handleEditService(service)}><Edit size={16} /></button>
@@ -300,6 +354,9 @@ export default function AdminPanelPage() {
             <div className={styles.tabs}>
                 <button className={`${styles.tabButton} ${activeTab === 'users' ? styles.active : ''}`} onClick={() => setActiveTab('users')}>
                     <User size={18} /> Gerenciar Usuários
+                </button>
+                <button className={`${styles.tabButton} ${activeTab === 'sms' ? styles.active : ''}`} onClick={() => setActiveTab('sms')}>
+                    <MessageSquareText size={18} /> Envios SMS
                 </button>
                 <button className={`${styles.tabButton} ${activeTab === 'services' ? styles.active : ''}`} onClick={() => setActiveTab('services')}>
                     <Settings size={18} /> Gerenciar Serviços
