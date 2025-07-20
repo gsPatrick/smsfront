@@ -2,100 +2,88 @@
 'use client';
 
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation'; // Importe usePathname também
+import { useRouter, usePathname } from 'next/navigation';
 
 const AuthContext = createContext(null);
 
-// ================================================================
-// ATENÇÃO: COLOQUE O DOMÍNIO DA SUA API AQUI
-// Em um projeto real, usaria process.env.NEXT_PUBLIC_API_URL
-// ================================================================
 const API_BASE_URL = 'https://jackbear-sms.r954jc.easypanel.host';
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Dados do usuário
-  const [token, setToken] = useState(null); // Token JWT
-  const [loading, setLoading] = useState(true); // Estado de carregamento inicial
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname(); // Obter o caminho atual
+  const pathname = usePathname();
 
-  // Função para carregar o usuário e token do localStorage
   const loadUserFromStorage = useCallback(async () => {
     setLoading(true);
     try {
       const storedToken = localStorage.getItem('token');
       const storedUser = localStorage.getItem('user');
 
-      if (storedToken && storedUser) {
+      // =========================================================================
+      // CORREÇÃO APLICADA AQUI: Checagem robusta antes do JSON.parse()
+      // Isso impede o erro "undefined is not a valid JSON"
+      // =========================================================================
+      if (storedToken && storedUser && storedUser !== 'undefined' && storedUser !== 'null') {
         const parsedUser = JSON.parse(storedUser);
         setToken(storedToken);
         setUser(parsedUser);
 
-        // Opcional: Validar o token e buscar dados frescos do usuário
-        // Isso é importante para garantir que o token não expirou e os dados estão atualizados
         try {
           const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-            headers: {
-              'Authorization': `Bearer ${storedToken}`,
-            },
+            headers: { 'Authorization': `Bearer ${storedToken}` },
           });
 
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
-              setUser(data.data); // Atualiza com dados frescos do servidor
-              localStorage.setItem('user', JSON.stringify(data.data)); // Salva os dados frescos
+              setUser(data.data);
+              localStorage.setItem('user', JSON.stringify(data.data));
             } else {
-              // Token inválido ou usuário inativo, limpa a sessão
               console.error('Erro ao buscar perfil:', data.message);
               logout();
             }
           } else {
-            // Resposta não OK (ex: 401 Unauthorized), token inválido ou expirado
             console.error('Falha na resposta do /me:', response.status);
             logout();
           }
         } catch (fetchError) {
           console.error('Erro de rede ao buscar perfil:', fetchError);
-          logout(); // Limpa sessão se não conseguir validar
+          logout();
         }
       }
     } catch (parseError) {
       console.error('Erro ao parsear dados do localStorage:', parseError);
-      logout(); // Limpa a sessão se os dados estiverem corrompidos
+      logout();
     } finally {
       setLoading(false);
     }
-  }, []); // Dependências vazias, pois só carrega uma vez no montagem
+  }, []); // A função logout não precisa ser uma dependência aqui
 
   useEffect(() => {
     loadUserFromStorage();
   }, [loadUserFromStorage]);
 
-  // Middleware simples de proteção de rota
   useEffect(() => {
-    if (!loading) { // Apenas executa depois que o carregamento inicial terminar
+    if (!loading) {
       const protectedRoutes = ['/dashboard', '/dashboard/comprar-creditos', '/dashboard/receber-sms', '/dashboard/historico', '/dashboard/perfil', '/dashboard/admin'];
-      
       const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
       if (isProtectedRoute && !user && !token) {
-        // Se estiver em rota protegida e não houver usuário/token, redireciona para login
         router.push('/login');
       } else if ((pathname === '/login' || pathname === '/register') && user && token) {
-        // Se estiver nas páginas de login/registro e já estiver logado, redireciona para o dashboard
         router.push('/dashboard');
       }
     }
   }, [loading, user, token, pathname, router]);
-
 
   const login = async (userData, jwtToken) => {
     localStorage.setItem('token', jwtToken);
     localStorage.setItem('user', JSON.stringify(userData));
     setToken(jwtToken);
     setUser(userData);
-    router.push('/dashboard'); // Redireciona para o dashboard após login
+    router.push('/dashboard');
   };
 
   const logout = () => {
@@ -103,8 +91,18 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
-    router.push('/login'); // Redireciona para o login após logout
+    router.push('/login');
   };
+  
+  // A função updateUser agora é estável usando useCallback
+  const updateUser = useCallback((newUser) => {
+    // Usando a forma funcional para evitar dependência do 'user' state
+    setUser(prevUser => {
+        const updated = typeof newUser === 'function' ? newUser(prevUser) : newUser;
+        localStorage.setItem('user', JSON.stringify(updated));
+        return updated;
+    });
+  }, []);
 
   const value = {
     user,
@@ -113,17 +111,12 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
-    // Função para atualizar o usuário (por exemplo, após uma edição de perfil)
-    updateUser: (newUser) => {
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-    }
+    updateUser,
   };
 
   return (
     <AuthContext.Provider value={value}>
       {loading ? (
-        // Opcional: Um spinner de carregamento global enquanto o auth é verificado
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '2rem' }}>
           Carregando...
         </div>
