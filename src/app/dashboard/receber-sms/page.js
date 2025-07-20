@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Search, Copy, RefreshCw, XCircle, Clock, MessageSquareText, Send, Instagram, Utensils, Car, Facebook, Globe, Film, MessageCircle, ChevronDown } from 'lucide-react';
 import styles from './ReceberSms.module.css';
-import ServiceCard from '@/components/ServiceCard/Service-Card';
+import ServiceCard from '../../../components/ServiceCard/ServiceCard';
 import { useAuth } from '../../context/AuthContext';
 import { authenticatedFetch } from '../../utils/api';
 
