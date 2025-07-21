@@ -1,54 +1,30 @@
+/* src/app/dashboard/receber-sms/ReceberSms.module.css */
+
 .container {
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* ============================ */
 /*        TELA DE SELEÇÃO       */
 /* ============================ */
-.selectionGrid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-}
-@media (min-width: 1024px) {
-    .selectionGrid {
-        grid-template-columns: 2fr 1fr;
-    }
-}
 
-.selectionColumn {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.summaryColumn {
-    position: sticky;
-    top: 100px;
-}
-
-.stepBox, .activationBox {
-    background-color: var(--white);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
+.selectionContainer {
+    width: 100%;
 }
 
 .sectionTitle { 
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600; 
     color: var(--text-dark); 
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
-.countrySelector {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+.sectionSubtitle {
     font-size: 1rem;
-    background-color: var(--white);
-    cursor: pointer;
+    color: var(--text-light);
+    margin-bottom: 2rem;
 }
 
 .searchBar {
@@ -79,48 +55,189 @@
     position: relative;
 }
 
-.placeholderText {
+.placeholderText, .noResults {
     margin: auto;
     text-align: center;
     color: var(--text-light);
     padding: 2rem 0;
+    grid-column: 1 / -1; /* Ocupa todas as colunas */
 }
-
-.summaryItem { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-.summaryItem span { color: var(--text-light); }
-.summaryItem strong { color: var(--text-dark); font-weight: 600; }
-
-.requestButton {
-    width: 100%;
-    padding: 0.8rem;
-    background-color: var(--primary);
-    color: var(--white);
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.requestButton:hover { background-color: var(--primary-hover); }
-.requestButton:disabled { background-color: #a3caff; cursor: not-allowed; }
 
 /* ============================ */
 /*        TELA DE ATIVAÇÃO      */
 /* ============================ */
+
 .activationCard {
-    /* ... (Estilos da tela de ativação permanecem os mesmos) ... */
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.activationHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.activationIconWrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--secondary-bg);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activationHeader .sectionTitle {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.cancelButton {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.cancelButton:hover {
+    background-color: var(--danger);
+    color: var(--white);
+    border-color: var(--danger);
+}
+
+.activationBody {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+@media (min-width: 640px) {
+    .activationBody {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.infoBox {
+    background-color: var(--secondary-bg);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.infoLabel {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.infoValue {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.copyButton {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    display: flex;
+}
+.copyButton:hover {
+    background-color: var(--border-color);
+    color: var(--text-dark);
+}
+
+.countdown {
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.smsCodeArea {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+}
+
+.waitingForCode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    color: var(--text-light);
+    padding: 1rem;
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+}
+
+.codeReceived {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px;
+    justify-content: center;
+    background-color: #e6f9f0;
+    color: #057A55;
+    padding: 1rem;
+    border-radius: 8px;
+}
+.codeReceived .copyButton {
+    color: #057A55;
+}
+
+.activationActions {
+    margin-top: 1rem;
+}
+
+.reactivateButton {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.reactivateButton:hover:not(:disabled) {
+    background-color: var(--primary);
+    color: var(--white);
+}
+.reactivateButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ============================ */
 /*        UTILITÁRIOS           */
 /* ============================ */
 .loadingState, .errorState {
-    position: absolute; /* Para centralizar dentro do .servicesGrid */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -132,6 +249,7 @@
     color: var(--text-light);
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 8px;
+    z-index: 10;
 }
 .errorState {
     color: var(--danger);
