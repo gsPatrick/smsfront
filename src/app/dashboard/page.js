@@ -10,6 +10,19 @@ import styles from './DashboardPage.module.css';
 import { useAuth } from '../context/AuthContext';
 import { authenticatedFetch } from '../utils/api';
 
+// NOVO: Mapeamento de códigos de serviço para nomes amigáveis
+const serviceNamesMap = {
+  'ub': 'Uber',
+  'wa': 'Whatsapp',
+  'tg': 'Telegram',
+  'fb': 'Facebook',
+  'ig': 'Instagram',
+  'go': 'Google/Youtube',
+  'ifood': 'iFood',
+  '99': '99 App'
+  // Adicione outros serviços conforme necessário
+};
+
 export default function DashboardPage() {
   const { user, token, loading: authLoading } = useAuth();
   const [dashboardData, setDashboardData] = useState({
@@ -30,48 +43,49 @@ export default function DashboardPage() {
     setDataLoading(true);
     setError(null);
     try {
-      // 1. Obter Saldo de Créditos (continua igual)
-      const balanceData = await authenticatedFetch('/api/credits/balance', 'GET', null, token);
-      
-      // 2. Obter Histórico de SMS e Dados para o Gráfico
-      const smsHistoryData = await authenticatedFetch('/api/sms/history?limit=100', 'GET', null, token);
-      const chartStats = await authenticatedFetch('/api/sms/stats?period=daily&days=30', 'GET', null, token);
+      const [balanceData, smsHistoryData, chartStats] = await Promise.all([
+        authenticatedFetch('/api/credits/balance', 'GET', null, token),
+        authenticatedFetch('/api/sms/history?limit=100', 'GET', null, token),
+        authenticatedFetch('/api/sms/stats?period=daily&days=30', 'GET', null, token)
+      ]);
 
-      // =========================================================================
-      // ✅ CORREÇÃO APLICADA AQUI
-      // Adicionamos verificações para garantir que os dados existem antes de usá-los.
-      // Isso evita o erro "Cannot read properties of undefined (reading 'pagination')"
-      // =========================================================================
       let totalSent = 0;
       let deliveredSms = 0;
       let failedSms = 0;
       let recentSmsMessages = [];
 
-      // Apenas processa os dados do histórico se eles existirem
       if (smsHistoryData && smsHistoryData.pagination && smsHistoryData.messages) {
         totalSent = smsHistoryData.pagination.total_items;
-        deliveredSms = smsHistoryData.messages.filter(msg => msg.status === 'received').length;
-        failedSms = smsHistoryData.messages.filter(msg => msg.status === 'cancelled').length;
+        
+        // Contagem correta baseada no status
+        smsHistoryData.messages.forEach(msg => {
+            if(msg.status === 'received' || msg.status === 'completed') {
+                deliveredSms++;
+            } else if (msg.status === 'cancelled' || msg.status === 'failed') {
+                failedSms++;
+            }
+        });
         
         recentSmsMessages = smsHistoryData.messages.slice(0, 5).map(msg => ({
           id: msg.id,
-          service: msg.metadata?.service_name || msg.service_code, 
-          date: new Date(msg.created_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
-          status: msg.status === 'received' ? 'Entregue' : msg.status === 'cancelled' ? 'Falhou' : 'Pendente',
+          // ALTERADO: Usa o mapa de nomes para exibir o nome correto
+          service: serviceNamesMap[msg.service_code] || msg.service_code.toUpperCase(), 
+          // ALTERADO: Corrige o nome do campo de 'created_at' para 'createdAt'
+          date: new Date(msg.createdAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
+          status: msg.status === 'received' || msg.status === 'completed' ? 'Entregue' : msg.status === 'cancelled' || msg.status === 'failed' ? 'Falhou' : 'Pendente',
           amount: `R$ ${parseFloat(msg.cost || 0).toFixed(2).replace('.', ',')}`,
         }));
       }
 
-      const deliveryRate = totalSent > 0 ? ((deliveredSms / totalSent) * 100).toFixed(2) : 0;
+      const deliveryRate = totalSent > 0 ? ((deliveredSms / totalSent) * 100).toFixed(0) : 0;
       
-      // Processa dados do gráfico (também com verificação)
       const formattedChartData = Array.isArray(chartStats) ? chartStats.map(item => ({
         name: item.date,
+        // Mantém a nomenclatura original para consistência
         envios: item.delivered_sms,
         falhas: item.failed_sms,
       })) : [];
 
-      // Atualiza o estado com os dados seguros
       setDashboardData({
         credits: `R$ ${parseFloat(balanceData?.credits || 0).toFixed(2).replace('.', ',')}`,
         totalSent: totalSent,
@@ -98,25 +112,21 @@ export default function DashboardPage() {
       title: "Créditos Disponíveis",
       value: dashboardData.credits,
       icon: <Wallet size={24} />,
-      change: null
     },
     {
       title: "Envios (Total)",
       value: dashboardData.totalSent,
       icon: <Send size={24} />,
-      change: null
     },
     {
       title: "Taxa de Entrega",
       value: dashboardData.deliveryRate,
       icon: <CheckCircle size={24} />,
-      change: null
     },
     {
       title: "Falhas",
       value: dashboardData.failedSms,
       icon: <XCircle size={24} />,
-      change: null
     }
   ], [dashboardData]);
 
@@ -131,7 +141,6 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.container}>
-      {/* Seção de KPIs */}
       <div className={styles.kpiGrid}>
         {kpiData.map((kpi, index) => (
           <StatsCard
@@ -139,12 +148,10 @@ export default function DashboardPage() {
             icon={kpi.icon}
             title={kpi.title}
             value={kpi.value}
-            change={kpi.change}
           />
         ))}
       </div>
 
-      {/* Seção de Gráficos e Transações Recentes */}
       <div className={styles.mainGrid}>
         <div className={styles.chartContainer}>
           <h3 className={styles.sectionTitle}>Uso de SMS nos últimos 30 dias</h3>
@@ -152,8 +159,8 @@ export default function DashboardPage() {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={dashboardData.chartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} />
+                <YAxis axisLine={false} tickLine={false} fontSize={12} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'var(--white)',
@@ -167,7 +174,7 @@ export default function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className={styles.noDataMessage}>Nenhum dado de uso de SMS para o período.</div>
+            <div className={styles.noDataMessage}>Nenhum dado de uso de SMS para exibir no gráfico.</div>
           )}
         </div>
 
@@ -195,7 +202,7 @@ export default function DashboardPage() {
                   ))
                 ) : (
                   <tr>
-                      <td colSpan="4" className={styles.noResults}>Nenhum envio recente.</td>
+                      <td colSpan="4" className={styles.noResults}>Nenhum envio recente encontrado.</td>
                   </tr>
                 )}
               </tbody>

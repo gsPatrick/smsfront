@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Menor espaçamento em telas pequenas */
+  gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
@@ -15,11 +15,10 @@
    ================================= */
 .kpiGrid {
   display: grid;
-  grid-template-columns: 1fr; /* 1 coluna por padrão (mobile) */
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
-/* 2 colunas para tablets */
 @media (min-width: 640px) {
   .kpiGrid {
     grid-template-columns: repeat(2, 1fr);
@@ -27,7 +26,6 @@
   }
 }
 
-/* 4 colunas para desktops */
 @media (min-width: 1024px) {
   .kpiGrid {
     grid-template-columns: repeat(4, 1fr);
@@ -40,14 +38,12 @@
    ================================= */
 .mainGrid {
   display: grid;
-  grid-template-columns: 1fr; /* 1 coluna por padrão (mobile), empilhados */
+  grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 
-/* Layout lado a lado para desktops */
 @media (min-width: 1200px) {
   .mainGrid {
-    /* O grid principal terá 3 colunas de fração */
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -57,13 +53,11 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1.5rem;
-  /* Ocupa todo o espaço disponível na sua linha do grid */
   grid-column: span 1;
 }
 
 @media (min-width: 1200px) {
   .chartContainer {
-    /* Em telas grandes, o gráfico ocupa 2 das 3 colunas */
     grid-column: span 2;
   }
 }
@@ -75,7 +69,6 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  /* Ocupa todo o espaço disponível na sua linha do grid */
   grid-column: span 1;
 }
 
@@ -88,7 +81,7 @@
 
 .tableWrapper {
   flex-grow: 1;
-  overflow-x: auto; /* Permite scroll horizontal na tabela se necessário */
+  overflow-x: auto;
 }
 
 .table {
@@ -126,19 +119,22 @@
     color: var(--text-dark);
 }
 
-/* ... (seus estilos existentes) ... */
-
-.loadingState, .errorState {
+.loadingState, .errorState, .noDataMessage, .noResults {
     width: 100%;
-    height: 300px; /* Altura para centralizar o texto */
+    min-height: 300px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: var(--text-light);
     background-color: var(--white);
     border: 1px solid var(--border-color);
     border-radius: 12px;
+}
+.transactionsContainer .noResults {
+    min-height: auto;
+    padding: 2rem;
+    border: none;
 }
 
 .errorState {
