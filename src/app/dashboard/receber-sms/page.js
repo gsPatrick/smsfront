@@ -38,14 +38,14 @@ export default function ReceberSmsPage() {
   const [countdown, setCountdown] = useState(120);
   const [smsCode, setSmsCode] = useState('');
 
-  // 1. Carrega a lista de TODOS os serviços ao iniciar
+  // 1. Carrega a lista de serviços com PREÇO INICIAL
   useEffect(() => {
     if (!authLoading && token) {
       const loadServices = async () => {
         setPageLoading(true);
         setError(null);
         try {
-          const serviceData = await authenticatedFetch('/api/sms/get-all-services', 'GET', null, token);
+          const serviceData = await authenticatedFetch('/api/sms/services-with-prices', 'GET', null, token);
           const formattedServices = serviceData.map(svc => ({
             ...svc,
             icon: serviceIconsMap[svc.code] || <MessageSquareText size={24} />
@@ -87,7 +87,7 @@ export default function ReceberSmsPage() {
   // 3. Função chamada PELO MODAL para solicitar o número
   const handleRequestNumber = useCallback(async (country) => {
     if (!selectedService || !country) return;
-    setIsLoading(true); // Usado para um futuro spinner global, se necessário
+    setIsLoading(true);
     setError(null);
 
     try {
@@ -106,7 +106,6 @@ export default function ReceberSmsPage() {
       setCountdown(120);
       setSmsCode('');
       updateUser(prevUser => ({ ...prevUser, credits: parseFloat(prevUser.credits) - parseFloat(country.sellPrice) }));
-      // Opcional: mostrar uma notificação de sucesso mais robusta
     } catch (err) {
       alert(`Erro ao solicitar número: ${err.message}`);
     } finally {
@@ -134,7 +133,7 @@ export default function ReceberSmsPage() {
   }, [activeNumber, token]);
 
   const handleReactivateNumber = useCallback(async () => {
-    if (!activeNumber || (user && parseFloat(user.credits) < parseFloat(activeNumber.service.sellPrice))) {
+    if (!activeNumber || (user && parseFloat(user.credits) < parseFloat(activeNumber.service.startingPrice))) { // Use startingPrice as fallback
         alert("Saldo insuficiente para reativar.");
         return;
     }
@@ -143,7 +142,7 @@ export default function ReceberSmsPage() {
       await authenticatedFetch(`/api/sms/reactivate/${activeNumber.id}`, 'POST', null, token);
       setCountdown(120);
       setSmsCode('');
-      updateUser(prevUser => ({ ...prevUser, credits: parseFloat(prevUser.credits) - parseFloat(activeNumber.service.sellPrice) }));
+      updateUser(prevUser => ({ ...prevUser, credits: parseFloat(prevUser.credits) - parseFloat(activeNumber.country.sellPrice) })); // debit correct price
     } catch (err) {
       alert(`Erro ao reativar número: ${err.message}`);
     } finally {
