@@ -355,9 +355,6 @@ export default function AdminPanelPage() {
                 <button className={`${styles.tabButton} ${activeTab === 'users' ? styles.active : ''}`} onClick={() => setActiveTab('users')}>
                     <User size={18} /> Gerenciar Usuários
                 </button>
-                <button className={`${styles.tabButton} ${activeTab === 'sms' ? styles.active : ''}`} onClick={() => setActiveTab('sms')}>
-                    <MessageSquareText size={18} /> Envios SMS
-                </button>
                 <button className={`${styles.tabButton} ${activeTab === 'services' ? styles.active : ''}`} onClick={() => setActiveTab('services')}>
                     <Settings size={18} /> Gerenciar Serviços
                 </button>
